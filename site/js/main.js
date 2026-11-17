@@ -44,15 +44,9 @@ const tripLink = (path) => `#/${path}${trip ? `?${tripToQuery(trip)}` : ""}`;
 
 // RoamReady's own 3 photos, for pages that aren't about one country
 const UNIVERSAL = {
-<<<<<<< HEAD
-  hero: "assets/photos/universal/hero.webp",     // Home and Sign up
-  plan: "assets/photos/universal/plan.webp",     // Plan a trip, No trip yet, About, account pages
-  arrive: "assets/photos/universal/arrive.webp", // the photo beside the sources on Home
-=======
   hero: "assets/photos/universal/hero.webp",     // the beach, beside the sources on Home
   plan: "assets/photos/universal/plan.webp",     // Plan a trip, No trip yet, About, account pages
   arrive: "assets/photos/universal/arrive.webp", // the airport, behind the Home hero (David, Nov 16)
->>>>>>> 7c2d7dff9d77e1a854c80d5a5a19cdf2d06433fc
 };
 
 // a country's photo lives in css/photos.css, not here: the page only says
@@ -90,11 +84,7 @@ function noTrip() {
 
 function home() {
   return `<div class="page home">
-<<<<<<< HEAD
-    <div class="band-wrap">${band(UNIVERSAL.hero, { arcs: false, fill: true })}
-=======
     <div class="band-wrap">${band(UNIVERSAL.arrive, { arcs: false, fill: true })}
->>>>>>> 7c2d7dff9d77e1a854c80d5a5a19cdf2d06433fc
     <div class="container">
       <section class="hero">
         <div>
@@ -157,11 +147,7 @@ function trustSection() {
       <ul class="trust-tiles">${tiles.map(([icon, tint, title, text]) => `<li class="card">
         <span class="icon-circle" style="background: var(--rr-guide-tint-${tint})"><img src="${A}${icon}.svg" alt="" /></span>
         <h3 class="title-m">${title}</h3><p class="small">${text}</p></li>`).join("")}</ul>
-<<<<<<< HEAD
-      <img class="trust-photo" src="${UNIVERSAL.arrive}" alt="" loading="lazy" />
-=======
       <img class="trust-photo" src="${UNIVERSAL.hero}" alt="" loading="lazy" />
->>>>>>> 7c2d7dff9d77e1a854c80d5a5a19cdf2d06433fc
     </div>
   </section>`;
 }
@@ -535,19 +521,6 @@ function wireTrip() {
 
 const loadTopicData = (country) => (country === "japan" ? loadJapanResearch() : loadCountryTopics());
 
-<<<<<<< HEAD
-// the card beside a guide or topic page: a back link, the trip, a button, then
-// the list of links (hidden on one-column layouts)
-function sidebar({ label, back, backText, button, links }) {
-  return `<nav class="card sidebar" aria-label="${label}">
-    <a class="back" href="${back}"><img src="${A}icon-arrow-left.svg" alt="" />${backText}</a>
-    <div class="trip-summary">
-      <p><strong>${esc(countryName(trip.country))}</strong><span class="small">${esc(formatRange(trip))}</span></p>
-      ${button}
-    </div>
-    <hr />
-    <ul class="guide-nav">${links}</ul>
-=======
 // the two cards beside a guide or topic page (David, Nov 15: two sections, no
 // divider line): the back link, the trip and a button, then the list of links
 // in its own card (hidden on one-column layouts)
@@ -563,7 +536,6 @@ function sidebar({ label, back, backText, button, links }) {
     <div class="card side-card guide-nav-card">
       <ul class="guide-nav">${links}</ul>
     </div>
->>>>>>> 7c2d7dff9d77e1a854c80d5a5a19cdf2d06433fc
   </nav>`;
 }
 
