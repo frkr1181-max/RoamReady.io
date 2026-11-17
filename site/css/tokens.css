@@ -2,20 +2,6 @@
    "RoamReady hi-fi design system" frame). names match the Figma variables so a value
    can be traced back: var(--rr-color-text-primary) is color/text/primary in Figma. */
 :root {
-  /* Shared typography and photo treatments used by the current components. */
-  --rr-text-display: var(--rr-h1-guide);
-  --rr-text-heading: var(--rr-h2);
-  --rr-text-subhead: 28px;
-  --rr-text-title: 20px;
-  --rr-text-body: 17px;
-  --rr-text-small: 15px;
-  --rr-text-caption: 13px;
-  --rr-leading-body: 1.6;
-  --rr-leading-snug: 1.25;
-  --rr-leading-tight: 1.05;
-  --rr-color-photo-wash: rgba(255, 251, 254, 0.7);
-  --rr-color-photo-wash-strong: rgba(255, 251, 254, 0.8);
-
   /* light mode only for now: native controls (date pickers, scrollbars) stay light */
   color-scheme: only light;
 
@@ -50,6 +36,11 @@
   --rr-color-photo-shade-strong: rgba(0, 0, 0, 0.55);
   --rr-color-photo-shade: rgba(0, 0, 0, 0.35);
   --rr-color-photo-shade-soft: rgba(0, 0, 0, 0.2);
+  /* the light snow wash over the Home photo, with navy text on it (David, Nov 16) */
+  --rr-color-photo-wash: rgba(255, 251, 254, 0.7);
+  --rr-color-photo-wash-strong: rgba(255, 251, 254, 0.8);
+  /* four text colors, nothing else (David, Nov 15): navy, muted, snow on
+     photos / teal / navy, and teal for links in running text */
   --rr-color-text-primary: var(--rr-palette-navy);
   --rr-color-text-secondary: var(--rr-palette-muted);
   --rr-color-text-inverse: var(--rr-palette-snow);
@@ -109,10 +100,17 @@
   /* type: Gabarito only, seven sizes for the whole site (David, Nov 15: it had
      about twenty). every font-size in site.css is one of these */
   --rr-font: "Gabarito", Arial, sans-serif;
-  --rr-display-l: 72px;
-  --rr-h1: 56px;
-  --rr-h1-guide: 80px;  /* guide and topic titles on the photo, larger since the icon went (David, Nov 11) */
-  --rr-h2: 44px;
+  --rr-text-display: 72px;  /* Home hero, page titles on photos */
+  --rr-text-heading: 44px;  /* section titles, the trip name */
+  --rr-text-subhead: 28px;  /* dialog and topic-section titles, emergency numbers */
+  --rr-text-title: 22px;    /* card titles, login, the Home lead line */
+  --rr-text-body: 17px;     /* body, inputs, buttons, nav, sidebar links */
+  --rr-text-small: 15px;    /* secondary text, footer, chips, Learn more */
+  --rr-text-caption: 13px;  /* sidebar group labels, badges, verified dates */
+  /* three line heights: big type, titles and labels, reading text */
+  --rr-leading-tight: 1.02;
+  --rr-leading-snug: 1.2;
+  --rr-leading-body: 1.5;
 }
 
 /* motion tokens. the springs are sampled from Apple-style springs (the same
@@ -153,9 +151,9 @@
     --rr-space-card: 24px;
     --rr-space-section: 48px;
     --rr-space-end: 64px;
-    --rr-display-l: 48px;
-    --rr-h1: 40px;   /* Hi-fi/Heading/H1 mobile */
-    --rr-h1-guide: 44px;  /* a three-line title still fits the shorter phone photo */
-    --rr-h2: 32px;
+    --rr-text-display: 44px;  /* a three-line topic title still fits the shorter phone photo */
+    --rr-text-heading: 32px;
+    --rr-text-subhead: 24px;
+    --rr-text-title: 20px;
   }
 }
