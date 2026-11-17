@@ -13,8 +13,8 @@
   --rr-leading-body: 1.6;
   --rr-leading-snug: 1.25;
   --rr-leading-tight: 1.05;
-  --rr-color-photo-wash: rgba(255, 251, 254, 0.94);
-  --rr-color-photo-wash-strong: rgba(255, 251, 254, 0.98);
+  --rr-color-photo-wash: rgba(255, 251, 254, 0.7);
+  --rr-color-photo-wash-strong: rgba(255, 251, 254, 0.8);
 
   /* light mode only for now: native controls (date pickers, scrollbars) stay light */
   color-scheme: only light;
