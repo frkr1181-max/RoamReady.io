@@ -44,9 +44,15 @@ const tripLink = (path) => `#/${path}${trip ? `?${tripToQuery(trip)}` : ""}`;
 
 // RoamReady's own 3 photos, for pages that aren't about one country
 const UNIVERSAL = {
+<<<<<<< HEAD
   hero: "assets/photos/universal/hero.webp",     // Home and Sign up
   plan: "assets/photos/universal/plan.webp",     // Plan a trip, No trip yet, About, account pages
   arrive: "assets/photos/universal/arrive.webp", // the photo beside the sources on Home
+=======
+  hero: "assets/photos/universal/hero.webp",     // the beach, beside the sources on Home
+  plan: "assets/photos/universal/plan.webp",     // Plan a trip, No trip yet, About, account pages
+  arrive: "assets/photos/universal/arrive.webp", // the airport, behind the Home hero (David, Nov 16)
+>>>>>>> 7c2d7dff9d77e1a854c80d5a5a19cdf2d06433fc
 };
 
 // a country's photo lives in css/photos.css, not here: the page only says
@@ -84,9 +90,13 @@ function noTrip() {
 
 function home() {
   return `<div class="page home">
+<<<<<<< HEAD
     <div class="band-wrap">${band(UNIVERSAL.hero, { arcs: false, fill: true })}
+=======
+    <div class="band-wrap">${band(UNIVERSAL.arrive, { arcs: false, fill: true })}
+>>>>>>> 7c2d7dff9d77e1a854c80d5a5a19cdf2d06433fc
     <div class="container">
-      <section class="hero on-dark">
+      <section class="hero">
         <div>
           <h1 tabindex="-1">Let’s gear up!</h1>
           <p class="lead">Give us some basic details of your trip and we’ll create an easy to understand dashboard to assist in making sure you’re ready for anything.</p>
@@ -147,7 +157,11 @@ function trustSection() {
       <ul class="trust-tiles">${tiles.map(([icon, tint, title, text]) => `<li class="card">
         <span class="icon-circle" style="background: var(--rr-guide-tint-${tint})"><img src="${A}${icon}.svg" alt="" /></span>
         <h3 class="title-m">${title}</h3><p class="small">${text}</p></li>`).join("")}</ul>
+<<<<<<< HEAD
       <img class="trust-photo" src="${UNIVERSAL.arrive}" alt="" loading="lazy" />
+=======
+      <img class="trust-photo" src="${UNIVERSAL.hero}" alt="" loading="lazy" />
+>>>>>>> 7c2d7dff9d77e1a854c80d5a5a19cdf2d06433fc
     </div>
   </section>`;
 }
@@ -221,7 +235,7 @@ function plan() {
           </div>
           <div class="field">
             <label for="trip-description">Trip description (optional)</label>
-            <textarea class="input-area" id="trip-description" maxlength="500" placeholder="For example: My first time abroad, mostly food, museums and a few day trips.">${esc(t.description)}</textarea><p class="small">This optional description stays in this tab and is not saved to your account.</p>
+            <textarea class="input-area" id="trip-description" maxlength="500" placeholder="For example: Mostly food, museums and a few day trips.">${esc(t.description)}</textarea><p class="small">This optional description stays in this tab and is not saved to your account.</p>
           </div>
           <div><button class="btn btn-primary btn-l" type="submit">Create my plan <img src="${A}icon-arrow-right.svg" alt="" /></button></div>
         </form>
@@ -354,7 +368,7 @@ const CHECKLIST = [
   "Save your emergency numbers for offline use",
 ];
 
-const CHECK = `<svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 9.5l3.5 3.5 7.5-8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const CHECK = `<svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 9.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 async function tripView() {
   if (!trip) return noTrip();
@@ -521,6 +535,7 @@ function wireTrip() {
 
 const loadTopicData = (country) => (country === "japan" ? loadJapanResearch() : loadCountryTopics());
 
+<<<<<<< HEAD
 // the card beside a guide or topic page: a back link, the trip, a button, then
 // the list of links (hidden on one-column layouts)
 function sidebar({ label, back, backText, button, links }) {
@@ -532,6 +547,23 @@ function sidebar({ label, back, backText, button, links }) {
     </div>
     <hr />
     <ul class="guide-nav">${links}</ul>
+=======
+// the two cards beside a guide or topic page (David, Nov 15: two sections, no
+// divider line): the back link, the trip and a button, then the list of links
+// in its own card (hidden on one-column layouts)
+function sidebar({ label, back, backText, button, links }) {
+  return `<nav class="sidebar" aria-label="${label}">
+    <div class="card side-card">
+      <a class="back" href="${back}"><img src="${A}icon-arrow-left.svg" alt="" />${backText}</a>
+      <div class="trip-summary">
+        <p><strong>${esc(countryName(trip.country))}</strong><span class="small">${esc(formatRange(trip))}</span></p>
+        ${button}
+      </div>
+    </div>
+    <div class="card side-card guide-nav-card">
+      <ul class="guide-nav">${links}</ul>
+    </div>
+>>>>>>> 7c2d7dff9d77e1a854c80d5a5a19cdf2d06433fc
   </nav>`;
 }
 
@@ -676,8 +708,8 @@ function about() {
     <div class="container">
       <h1 class="page-title" tabindex="-1">About RoamReady</h1>
       <div class="plan-row" style="grid-template-columns:1fr"><div class="card empty">
-        <p>RoamReady gathers the official rules for your first solo trip abroad into one checklist and a set of plain-language guides. Every fact links to the government or official page it came from.</p>
-        <p>It’s a CU Boulder Information Science senior capstone, built for travelers with a U.S. passport.</p>
+        <p>RoamReady gathers the official travel rules for the country you’re visiting into one checklist and a set of plain-language guides, matched to your dates and reason for travel. Every fact links to the government or official page it came from.</p>
+        <p>Built as a CU Boulder Information Science senior capstone, for travelers with a U.S. passport.</p>
       </div></div>
     </div></div>
     <div class="container">
