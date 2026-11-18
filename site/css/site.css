@@ -1,14 +1,10 @@
-/* RoamReady coded hi-fi. layout and components follow the Orbit screens in Figma;
-   every color, radius and shadow comes from tokens.css */
-
+/* ---------- base ---------- */
 *,
 *::before,
 *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
 
-/* light mode only, set again below :root so a host page in dark mode
-   can't turn dialogs, pickers or scrollbars dark */
 body, dialog { color-scheme: only light; }
 
 body {
@@ -24,12 +20,10 @@ button { cursor: pointer; }
 a { color: inherit; }
 h1, h2, h3, p { margin: 0; }
 
-/* one focus style everywhere: cyan on light surfaces, yellow on bands and navy */
 :focus-visible { outline: 3px solid var(--rr-color-focus); outline-offset: 3px; }
 .on-dark :focus-visible,
 .site-footer :focus-visible { outline-color: var(--rr-color-focus-on-dark); }
 
-/* page headings take focus after each route change (for screen readers); no ring needed */
 h1[tabindex="-1"]:focus { outline: none; }
 
 .visually-hidden {
@@ -51,7 +45,7 @@ h1[tabindex="-1"]:focus { outline: none; }
   padding: 0 var(--rr-gutter);
 }
 
-/* ---------- header (72px, Header/Desktop) ---------- */
+/* ---------- header ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 20;
   background: var(--rr-color-bg-surface);
@@ -60,7 +54,6 @@ h1[tabindex="-1"]:focus { outline: none; }
 .site-header .container { height: 72px; display: flex; align-items: center; justify-content: space-between; }
 
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; border-radius: var(--rr-radius-sm); }
-/* the buffalo logo (Nov 10), assets/logo/: mark 1.254:1, wordmark 5.348:1 */
 .logo .mark { width: 55.18px; height: 44px; }
 .logo .wordmark { width: 139.04px; height: 26px; }
 
@@ -74,7 +67,6 @@ h1[tabindex="-1"]:focus { outline: none; }
   background: var(--rr-color-action-selected); color: var(--rr-color-text-inverse);
   font-weight: 800; padding: 0 20px;
 }
-/* .nav .avatar, not .avatar, so the plain nav-link padding doesn't reach the round button */
 .nav .avatar {
   width: 44px; height: 44px; margin-left: 8px; padding: 0; border: 0; border-radius: var(--rr-radius-pill);
   background: var(--rr-color-bg-subtle); display: grid; place-items: center;
@@ -99,37 +91,27 @@ h1[tabindex="-1"]:focus { outline: none; }
 }
 @media (min-width: 861px) { .avatar .avatar-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
 
-/* ---------- band: the teal photo strip behind each page's title ---------- */
+/* ---------- photo band ---------- */
 .page { position: relative; }
 .band {
   position: absolute; left: 0; right: 0; top: 0; height: var(--band-h, 340px);
   background: var(--rr-color-bg-brand); overflow: hidden;
 }
 .band .photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* the Plan a trip / About photo: show its upper part (the traveller's head,
-   backpack and the skyline) in the short band instead of the middle */
 .band .photo[src$="universal/plan.webp"] { object-position: center 30%; }
-/* no color wash over the photos (David, Nov 10): they show in their own
-   colors. what's left is a plain dark shade, strongest at the top where the
-   white title sits and fading down, only so the text stays readable */
 .band .overlay {
   position: absolute; inset: 0;
   background: linear-gradient(180deg, var(--rr-color-photo-shade-strong) 0%, var(--rr-color-photo-shade) 45%, var(--rr-color-photo-shade-soft) 100%);
 }
 .band .overlay.plain { background: linear-gradient(180deg, var(--rr-color-bg-brand-deep), var(--rr-color-bg-brand)); }
-/* Home: the airport photo under a light snow wash instead of a dark shade
-   (David, Nov 16), so the navy headline and the logo both sit on a light
-   ground. the wash is a little stronger behind the logo, where the teal
-   "Ready" needs it: navy text measures 7:1 or better, "Ready" 3.1:1 */
 .home .band .overlay { background: linear-gradient(90deg, var(--rr-color-photo-wash) 46%, var(--rr-color-photo-wash-strong) 58%); }
 .home .band .photo { object-position: center 40%; }
-/* Decor/Band arcs: 1564.5 x 1153, anchored top-left as in Figma (inset -38.92% -2.95% 0 -5.69% of 1440 x 830) */
 .band .arcs { position: absolute; left: -82px; top: -323px; width: 1564.5px; height: 1153px; max-width: none; }
 .band.fill { height: auto; bottom: 0; }
 .band-wrap { position: relative; overflow: hidden; }
 .band-wrap > .container, .page > .container { position: relative; }
 
-/* ---------- buttons (Button: Primary, Secondary, Light, On dark) ---------- */
+/* ---------- buttons ---------- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 12px;
   height: 48px; padding: 0 20px; border-radius: var(--rr-radius-pill);
@@ -174,10 +156,6 @@ h1[tabindex="-1"]:focus { outline: none; }
 .login .options { display: flex; gap: 12px; flex-wrap: wrap; }
 .notice { font-size: var(--rr-text-small); padding: 12px 16px; border-radius: var(--rr-radius-sm); background: var(--rr-color-bg-subtle); }
 
-/* the logo and the word build themselves here (js/logo-build.js), big and
-   straight on the photo with no white disc behind them (David, Nov 11). they
-   replaced the spinning rings. on wide screens the art runs up to 80px past
-   the content edge, as the rings did, so the buffalo stays big next to the word */
 .hero-art {
   --bleed: clamp(0px, (100vw - var(--rr-content-width) - 2 * var(--rr-gutter)) / 2, 80px);
   justify-self: end; width: calc(100% + var(--bleed)); margin-right: calc(-1 * var(--bleed));
@@ -204,19 +182,14 @@ h1[tabindex="-1"]:focus { outline: none; }
 .trust-photo { border-radius: var(--rr-radius-lg); box-shadow: var(--rr-shadow-card); object-fit: cover; width: 100%; height: 100%; min-height: 280px; }
 
 /* ---------- plan a trip ---------- */
-/* every headline photo is the same height, with the same big title near its
-   bottom and the content starting below it: Plan a trip and the other pages
-   here match the guide pages (David, Nov 11) */
 .plan, .guide { --band-h: 234px; }
-.plan > .container { padding-top: var(--rr-space-top); }  /* padding, not margin, so it can't push the page below the header */
+.plan > .container { padding-top: var(--rr-space-top); }
 .page-title {
   min-height: calc(var(--band-h) - var(--rr-space-top)); display: flex; align-items: flex-end; padding-bottom: var(--rr-space-gap);
   color: var(--rr-color-text-inverse); font-weight: 900; font-size: var(--rr-text-display); line-height: var(--rr-leading-tight); letter-spacing: -0.02em;
 }
-/* About keeps its photo behind the whole card, so its title stays at the top */
 .about .page-title { min-height: 0; display: block; padding: var(--rr-space-top) 0 0; }
 .plan-row { margin-top: var(--rr-space-gap); padding-bottom: var(--rr-space-end); display: grid; grid-template-columns: minmax(0, 788px) 372px; gap: var(--rr-space-gap); align-items: start; }
-/* About: the band ends a section's space below the card, then the sections follow */
 .about .plan-row { padding-bottom: var(--rr-space-section); }
 .plan-form { padding: var(--rr-space-card); display: grid; gap: 28px; }
 .field { display: grid; gap: 8px; }
@@ -286,19 +259,12 @@ textarea.input-area:focus { border-color: var(--rr-color-border-strong); outline
 .stage li { display: flex; align-items: center; gap: 12px; font-weight: 700; }
 .swatch { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; flex: none; }
 .swatch img { width: 18px; height: 18px; }
-/* navy icons are hard to see on dark teal, so the plan stage's icons go white */
 .plan-stage + ul .swatch img { filter: brightness(0) invert(1); }
 
 /* ---------- trip dashboard ---------- */
-/* the hero fits one screen (David, Nov 10): the title, chips and all 8 guide
-   tiles fit in the first screen, and the photo band ends in a gentle curve
-   with the checklist peeking out below it, so it's clear there's more to
-   scroll to */
 .trip .band-wrap { border-radius: 0 0 50% 50% / 0 0 56px 56px; }
 .trip-band-content { padding-block: 32px 64px; position: relative; }
 .trip-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-/* the box floats over the (hidden) title instead of replacing it, so the page
-   doesn't move while editing. -14px = padding + border, so the text stays put */
 .trip-title.editing h1, .trip-title.editing .btn-icon-on-dark { visibility: hidden; }
 .trip-name-input {
   position: absolute; left: -14px; top: 50%; transform: translateY(-50%);
@@ -324,25 +290,15 @@ textarea.input-area:focus { border-color: var(--rr-color-border-strong); outline
 }
 .chips img { width: 16px; height: 16px; }
 
-/* tile height follows the window: 100svh minus the header (72), band padding
-   (32 + 64), the title block (about 100), the gap above the tiles (24), the
-   gap between rows (32) and the peek (72), split across 2 rows, kept between
-   150 and 240px. 32px gaps: Aahana's comment #15 (less tight and cluttered) */
 .tiles {
   margin-top: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; padding: 0; list-style: none;
   --tile-h: clamp(150px, calc((100svh - 396px) / 2), 240px);
 }
-/* tile = a colored band on top, then one white row with the title and the
-   arrow side by side (David, Nov 10: no empty white space in the cards).
-   the band takes all the height the row doesn't need */
 .tile {
   display: flex; flex-direction: column; height: var(--tile-h); container-type: size; overflow: hidden; text-decoration: none;
   border-radius: var(--rr-radius-lg); box-shadow: var(--rr-shadow-card);
 }
 .tile:focus-visible { outline-color: var(--rr-color-focus-on-dark); outline-offset: 4px; }
-/* the guide's line icon on the white rings, centered in the band (David,
-   Nov 11). the icon is a mask so it takes the stage's icon color (--tile-ink).
-   both scale with the band's height (the tile minus its 56px title row) */
 .tile-band {
   position: relative; flex: 1; min-height: 0; overflow: hidden; display: grid; place-items: center;
   background: var(--thumb-main); --ring: min(112px, calc(100cqh - 56px - 8px));
@@ -355,28 +311,18 @@ textarea.input-area:focus { border-color: var(--rr-color-border-strong); outline
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
   -webkit-mask-position: center; mask-position: center;
 }
-/* the white lives on the title row, not on the whole tile. a white tile under
-   a colored band showed through as a thin white rim around the band's
-   rounded edge (David spotted it, Nov 10) */
 .tile-body {
   flex: none; display: flex; align-items: center; justify-content: space-between;
   gap: 12px; min-height: 56px; padding: 8px 12px 8px 18px; background: var(--rr-color-bg-surface);
 }
 .tile-body .title-m { display: block; }
-/* body size, so two-word guide names stay on one line and every band matches */
 .tile .title-m { font-size: var(--rr-text-body); }
 
 .tile .arrow { align-self: center; }
-/* narrow tiles keep the title and drop the arrow */
 @container (max-width: 190px) { .tile .arrow { display: none; } }
-/* a small "No info yet" under the title when the guide has no reviewed facts
-   for this country (the team's empty state) */
 .tile-name { display: grid; gap: 2px; min-width: 0; }
 .tile-empty { color: var(--rr-color-text-secondary); line-height: var(--rr-leading-snug); }
 
-/* the band is the stage color: Plan teal, Arrive orange, Know sage, the same
-   as everywhere else (David, Nov 11). the icon is snow on Plan's dark teal and
-   navy on Arrive's orange and Know's sage, so every icon in a stage matches */
 .tile--entry, .tile--money, .tile--phones, .tile--health { --thumb-main: var(--rr-color-stage-plan); --tile-ink: var(--rr-palette-snow); }
 .tile--there, .tile--around { --thumb-main: var(--rr-color-stage-arrive); --tile-ink: var(--rr-palette-navy); }
 .tile--safety, .tile--culture { --thumb-main: var(--rr-color-stage-know); --tile-ink: var(--rr-palette-navy); }
@@ -407,7 +353,7 @@ textarea.input-area:focus { border-color: var(--rr-color-border-strong); outline
 .contact .icon-circle { width: 40px; height: 40px; background: var(--rr-color-bg-subtle); }
 .contact .icon-circle img { width: 20px; height: 20px; }
 .contact .number { display: block; margin-top: -6px; font-weight: 900; font-size: var(--rr-text-subhead); line-height: var(--rr-leading-snug); color: var(--rr-color-text-primary); }
-.contact .number a { text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }  /* 44px tap targets */
+.contact .number a { text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
 .contact .number a:hover { text-decoration: underline; }
 .contact .number.text { margin-top: 0; font-size: var(--rr-text-body); line-height: var(--rr-leading-snug); font-weight: 800; }
 .contact .what { display: block; font-size: var(--rr-text-small); color: var(--rr-color-text-secondary); }
@@ -417,9 +363,6 @@ a.contact:hover .number { text-decoration: underline; }
 .essentials .fallback { margin-top: 12px; }
 
 /* ---------- guide page ---------- */
-/* the title sits on the photo, to the right of the sidebar, with no icon, and
-   the cards start just below the photo (David, Nov 11). the title block fills
-   the rest of the photo's height and puts the title at its bottom */
 .guide-head {
   min-height: calc(var(--band-h) - var(--rr-space-top)); margin-bottom: var(--rr-space-gap);
   display: flex; align-items: flex-end; padding-bottom: var(--rr-space-gap);
@@ -429,15 +372,11 @@ a.contact:hover .number { text-decoration: underline; }
 .back { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px 0 12px; border-radius: var(--rr-radius-pill); font-weight: 800; font-size: var(--rr-text-body); text-decoration: none; color: var(--rr-color-text-inverse); }
 .back:hover { background: rgba(255, 255, 255, 0.12); }
 .back img { width: 20px; height: 20px; }
-/* guide and topic pages: the back link sits at the top of the sidebar card,
-   above the trip details (David, Nov 11) */
 .sidebar .back { color: var(--rr-color-text-primary); justify-self: start; height: auto; min-height: 44px; padding-block: 8px; line-height: var(--rr-leading-snug); }
 .sidebar .back:hover { background: var(--rr-color-bg-subtle); }
-/* padding, not margin: a top margin here would slip through to the page and push it below the header */
 .guide > .container { padding-top: var(--rr-space-top); }
 .guide-columns { padding-bottom: var(--rr-space-end); display: grid; grid-template-columns: 272px minmax(0, 1fr); gap: var(--rr-space-gap); align-items: start; }
-/* two cards: back link + trip, then the topic list (David, Nov 15) */
-.sidebar { display: grid; gap: var(--rr-space-gap); margin-top: 24px; }  /* sits a little lower on the photo (David, Nov 11) */
+.sidebar { display: grid; gap: var(--rr-space-gap); margin-top: 24px; }
 .side-card { padding: 16px; display: grid; gap: 16px; }
 .guide-nav-card { padding-block: 8px; }
 .trip-summary { padding: 0 4px; display: grid; gap: 10px; justify-items: start; }
@@ -462,7 +401,7 @@ a.contact:hover .number { text-decoration: underline; }
 .topic-body h2 { font-weight: 800; font-size: var(--rr-text-title); line-height: var(--rr-leading-snug); }
 .topic-body p { margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .learn { align-self: flex-end; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; font-weight: 800; font-size: var(--rr-text-small); text-decoration: none; }
-.learn::after { content: ""; position: absolute; inset: 0; border-radius: var(--rr-radius-lg); }  /* whole card opens Learn more */
+.learn::after { content: ""; position: absolute; inset: 0; border-radius: var(--rr-radius-lg); }
 .learn:focus-visible { outline: none; }
 .match { align-self: flex-start; margin-top: 10px; padding: 2px 10px; border-radius: var(--rr-radius-pill); background: var(--rr-color-bg-subtle); font-size: var(--rr-text-caption); font-weight: 700; color: var(--rr-color-text-primary); }
 
@@ -475,7 +414,6 @@ a.contact:hover .number { text-decoration: underline; }
 .source > img { width: 20px; height: 20px; flex: none; }
 .source:hover span { text-decoration: underline; }
 .source-text { overflow-wrap: anywhere; }
-/* inside the topic card and research notes the list sits flush with the text */
 .detail-sources .source-list, .research-note .source-list { padding: 0; }
 .detail-sources .source-list li, .research-note .source-list li { margin: 0; }
 
@@ -491,7 +429,6 @@ a.contact:hover .number { text-decoration: underline; }
 .detail-sources li { overflow-wrap: anywhere; }
 .topic-body .topic-status { -webkit-line-clamp: unset; display: block; font-weight: 700; }
 
-/* a draft research note, shown on its topic until the fact is published */
 .research-note { margin-top: 16px; padding: 20px; border-bottom: 1px solid var(--rr-color-border-subtle); border-radius: var(--rr-radius-sm); background: var(--rr-color-stage-arrive-tint); }
 .research-note h3 { font-weight: 800; font-size: var(--rr-text-title); line-height: var(--rr-leading-snug); }
 .research-note h4 { margin: 16px 0 0; font-weight: 800; font-size: var(--rr-text-body); }
@@ -500,7 +437,6 @@ a.contact:hover .number { text-decoration: underline; }
 .research-note li { overflow-wrap: anywhere; margin: 12px 0; }
 
 /* ---------- accounts ---------- */
-/* account controls reuse the hi-fi's colors, cards, fields and button styles */
 .account-form { max-width: 640px; margin: var(--rr-space-gap) auto; padding: var(--rr-space-card); display: grid; gap: 16px; }
 .account-form input { width: 100%; min-width: 0; }
 .saved-trips { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 24px; }
@@ -508,7 +444,6 @@ a.contact:hover .number { text-decoration: underline; }
 .saved-trips .btn { margin: 8px 8px 0 0; }
 .login .notice { color: inherit; }
 
-/* the confirm dialog (deleting a saved trip) */
 dialog.confirm {
   width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 0; border: 0;
   border-radius: var(--rr-radius-lg); box-shadow: var(--rr-shadow-lifted);
@@ -518,7 +453,7 @@ dialog.confirm::backdrop { background: var(--rr-color-bg-scrim); }
 .confirm .inner { padding: 28px; display: grid; gap: 16px; }
 .confirm h2 { font-weight: 900; font-size: var(--rr-text-subhead); line-height: var(--rr-leading-snug); letter-spacing: -0.01em; }
 
-/* ---------- footer (Footer/Desktop) ---------- */
+/* ---------- footer ---------- */
 .site-footer { background: var(--rr-color-bg-inverse); color: var(--rr-color-text-inverse); padding: 48px 0 32px; }
 .site-footer .top { display: flex; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
 .site-footer .brand { display: grid; gap: 12px; max-width: 340px; }
@@ -549,7 +484,6 @@ dialog.confirm::backdrop { background: var(--rr-color-bg-scrim); }
   .plan-below { grid-template-columns: 1fr; }
   .guide-columns { grid-template-columns: 1fr; }
   .guide-nav-card { display: none; }
-  /* one column: the title comes first, on the photo, then the sidebar and cards */
   .guide-main { display: contents; }
   .guide-head { order: -1; margin-bottom: 0; }
   .sidebar { margin-top: 0; }
@@ -562,9 +496,8 @@ dialog.confirm::backdrop { background: var(--rr-color-bg-scrim); }
   .trust-tiles { grid-template-columns: 1fr; }
   .site-footer .cols { gap: 40px; }
   .site-footer .cols ul { gap: 0; margin-top: 4px; }
-  .site-footer .cols a { display: flex; align-items: center; min-height: 44px; }  /* 44px phone targets, as in Footer/Mobile */
+  .site-footer .cols a { display: flex; align-items: center; min-height: 44px; }
 }
-/* phones: the dashboard gets two columns of compact tiles, icon on the left */
 @media (max-width: 600px) {
   .trip .band-wrap { border-radius: 0 0 50% 50% / 0 0 32px 32px; }
   .trip-band-content { padding-block: 24px 44px; }

@@ -1,16 +1,9 @@
-// the guest trip. nothing is saved to an account or to browser storage: the trip
-// lives in this page's memory and in the address bar (#/trip?country=japan&...),
-// so a refresh keeps the plan and closing the tab forgets it. the optional
-// description stays in memory only, since it can be personal.
-
 import { purposeById } from "./guides.js";
+
+// ---------- trip in the address ----------
 
 const FIELDS = ["country", "from", "to", "purpose", "name", "id"];
 
-// a saved test trip, so every page has data the moment it opens while working
-// on the design (David, Nov 10). null on the published site: the real "No trip
-// yet" flow. for local testing set it to, for example:
-// { country: "australia", from: "2027-03-01", to: "2027-03-30", purpose: "leisure", name: "", description: "" }
 export const DEMO_TRIP = null;
 let description = "";
 
@@ -32,6 +25,8 @@ export function rememberDescription(text) {
   description = text;
 }
 
+// ---------- dates ----------
+
 function parseDay(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return null;
   const [y, m, d] = value.split("-").map(Number);
@@ -39,7 +34,6 @@ function parseDay(value) {
   return new Date(timestamp).toISOString().slice(0,10)===value ? timestamp : null;
 }
 
-// inclusive trip length in days, or null when the dates aren't set
 export function tripDays(trip) {
   const start = parseDay(trip.from);
   const end = parseDay(trip.to);
@@ -50,7 +44,6 @@ export function tripDays(trip) {
 const monthDay = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 const fullDate = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
-// "Mar 15 – Mar 28, 2027", the one date format the hi-fi uses
 export function formatRange(trip) {
   const start = parseDay(trip.from);
   const end = parseDay(trip.to);
@@ -59,9 +52,9 @@ export function formatRange(trip) {
   return `${sameYear ? monthDay.format(start) : fullDate.format(start)} – ${fullDate.format(end)}`;
 }
 
-// what the facts API needs to filter conditional facts for this trip
+// ---------- facts filter ----------
+
 export function factQuery(trip) {
-  // the API accepts 1 to 36500 days; a typo like 2127 for 2027 stays in range
   const days = tripDays(trip) === null ? null : Math.min(tripDays(trip), 36500);
   return {
     stayMin: days,

@@ -7,8 +7,6 @@ export async function loadCountryTopics(){
  return pending;
 }
 
-// Excerpts must match the current eligible fact exactly. Changed/new live facts
-// remain visible in the overview instead of using a stale or incorrect excerpt.
 export function countrySubcards(data,country,guide,eligibleFacts){
  const card=data?.countries?.find(c=>c.country===country)?.cards.find(c=>c.id===guide.id);
  const allowed=eligibleFacts.filter(f=>!f.destination_slug||f.destination_slug===country);

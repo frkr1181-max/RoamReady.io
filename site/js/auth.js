@@ -1,6 +1,5 @@
-// Official, locally vendored Supabase Auth client. Only public configuration is loaded.
 import { AuthClient } from './vendor/auth-js.mjs';
-import { API_BASE } from './config.js?v=20261110-original24';  // same URL as api.js, so the module loads once
+import { API_BASE } from './config.js?v=20261110-original24';
 let pendingClient;
 export function authClient() {
   if (!pendingClient) pendingClient = (async () => {

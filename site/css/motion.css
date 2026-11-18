@@ -1,25 +1,15 @@
-/* RoamReady motion: the bouncy layer on top of site.css.
-   rules of thumb (Emil Kowalski's animation framework):
-   - only transform and opacity move; nothing starts from scale(0)
-   - entrances use the springs from tokens.css, presses use a fast ease-out
-   - hover motion only on devices with a real pointer
-   - with reduced motion, things fade instead of moving
-   js/motion.js adds the classes and the --i stagger index used below */
-
 /* ---------- entrances ---------- */
 @keyframes rr-rise { from { transform: translateY(24px) scale(0.96); } }
 @keyframes rr-pop { from { transform: translateY(16px) scale(0.9); } }
 @keyframes rr-fade { from { opacity: 0; } }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* big blocks: the dashboard's title row */
   .rr-rise {
     animation:
       rr-rise var(--rr-spring-bouncy-ms) var(--rr-spring-bouncy) both,
       rr-fade 300ms var(--rr-ease-out) both;
     animation-delay: calc(var(--i, 0) * var(--rr-stagger) + var(--base, 0ms));
   }
-  /* small repeated pieces: the dashboard's chips */
   .rr-pop {
     animation:
       rr-pop var(--rr-spring-playful-ms) var(--rr-spring-playful) both,
@@ -27,8 +17,6 @@
     animation-delay: calc(var(--i, 0) * var(--rr-stagger) + var(--base, 0ms));
   }
 
-  /* the dashboard's guide cards: the same pop, but slower and calmer, one
-     after another (David, Nov 11) */
   .rr-card {
     animation:
       rr-pop var(--rr-spring-gentle-ms) var(--rr-spring-gentle) both,
@@ -41,7 +29,7 @@
   .rr-rise, .rr-pop, .rr-card { animation: rr-fade 200ms ease both; }
 }
 
-/* ---------- presses: quick squish, springy release ---------- */
+/* ---------- presses ---------- */
 .btn, .purpose span, .task .box, .avatar, .menu-button, .btn-icon-on-dark, .learn .arrow {
   transition:
     transform var(--rr-spring-playful-ms) var(--rr-spring-playful),
@@ -51,7 +39,7 @@
 .purpose:active span { transform: scale(0.95); transition: transform 120ms var(--rr-ease-out); }
 .task:active .box { transform: scale(0.82); transition: transform 120ms var(--rr-ease-out); }
 
-/* ---------- hovers (real pointers only) ---------- */
+/* ---------- hovers ---------- */
 .tile, .topic {
   transition: transform var(--rr-spring-bouncy-ms) var(--rr-spring-bouncy), box-shadow 250ms var(--rr-ease-out);
 }
@@ -68,19 +56,17 @@
   .source .icon-circle { transition: transform var(--rr-spring-playful-ms) var(--rr-spring-playful); }
 }
 
-/* ---------- checklist: the box pops and the tick draws itself ---------- */
+/* ---------- checklist ---------- */
 .task .box svg path { stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset 250ms var(--rr-ease-out) 60ms; }
 .task[aria-pressed="true"] .box svg path { stroke-dashoffset: 0; }
 .task .box, .task .label { transition: transform var(--rr-spring-playful-ms) var(--rr-spring-playful), background-color 150ms ease, border-color 150ms ease, color 200ms ease; }
 
-/* ---------- trip purpose: the picked icon bounces ----------
-   only when you pick it (the input has focus then), not when the page opens
-   with a purpose already selected: no entrances outside the dashboard */
+/* ---------- trip purpose ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .purpose input:checked:focus + span img { animation: rr-pop var(--rr-spring-playful-ms) var(--rr-spring-playful) both; }
 }
 
-/* ---------- dialogs: spring in from the center, quick fade out ---------- */
+/* ---------- dialogs ---------- */
 @keyframes rr-dialog-in { from { transform: scale(0.94) translateY(12px); } }
 @keyframes rr-dialog-out { to { transform: scale(0.97); opacity: 0; } }
 @media (prefers-reduced-motion: no-preference) {
@@ -90,14 +76,14 @@
 dialog[open]::backdrop { animation: rr-fade 200ms var(--rr-ease-out); }
 dialog.closing::backdrop { animation: rr-fade 150ms var(--rr-ease-out) reverse forwards; }
 
-/* ---------- phone menu drops in ---------- */
+/* ---------- phone menu ---------- */
 @keyframes rr-drop { from { transform: translateY(-8px); opacity: 0; } }
 @media (prefers-reduced-motion: no-preference) {
   .nav.open { animation: rr-drop 220ms var(--rr-ease-out); }
   .nav.open > * { animation: rr-pop var(--rr-spring-playful-ms) var(--rr-spring-playful) both; animation-delay: calc(var(--i, 0) * 35ms); }
 }
 
-/* ---------- login and sign-up note slides in ---------- */
+/* ---------- login and sign-up note ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .notice:not([hidden]) { animation: rr-pop var(--rr-spring-playful-ms) var(--rr-spring-playful) both, rr-fade 200ms var(--rr-ease-out) both; }
 }

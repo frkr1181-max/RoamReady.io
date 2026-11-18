@@ -1,11 +1,7 @@
-// the adapter between the design and the data.
-// the database has 10 fact categories and 7 trip purposes; the hi-fi has 8 guides
-// and 4 purposes. this file is the only place that knows both, so neither side
-// has to rename anything. see ADR-001-coded-site.md for why.
+// ---------- guides and stages ----------
 
 const ICONS = "assets/figma/";
 
-// the 8 guides in the order the hi-fi shows them, grouped by trip stage
 export const GUIDES = [
   { id: "entry", stage: "plan", title: "Entry & documents", categories: ["entry"],
     blurb: "Visas, passport rules, arrival forms and what you can bring." },
@@ -27,8 +23,8 @@ export const GUIDES = [
   ...guide,
   color: `var(--rr-guide-${guide.id})`,
   tint: `var(--rr-guide-tint-${guide.id})`,
-  icon: `${ICONS}tile-${guide.id}.svg`,      // 48px icon for dashboard tiles
-  swatch: `${ICONS}swatch-${guide.id}.svg`,  // 18px white icon for the plan preview
+  icon: `${ICONS}tile-${guide.id}.svg`,
+  swatch: `${ICONS}swatch-${guide.id}.svg`,
 }));
 
 export const STAGES = [
@@ -41,14 +37,12 @@ export function guideById(id) {
   return GUIDES.find((guide) => guide.id === id);
 }
 
-// which guide a fact belongs to, from its database category
 export function guideForCategory(category) {
   return GUIDES.find((guide) => guide.categories.includes(category));
 }
 
-// the design's 4 purposes. `api` is what gets sent as ?purpose= to
-// GET /api/destinations/{slug}/facts. Emergency has no matching purpose in the
-// data, so it sends none and the API returns only the general facts.
+// ---------- purposes ----------
+
 export const PURPOSES = [
   { id: "leisure", label: "Leisure", api: "tourism", icon: `${ICONS}purpose-leisure.svg` },
   { id: "work", label: "Work", api: "work", icon: `${ICONS}purpose-work.svg` },
@@ -60,7 +54,8 @@ export function purposeById(id) {
   return PURPOSES.find((purpose) => purpose.id === id);
 }
 
-// group a country's facts into the 8 guides, keeping the API's order inside each
+// ---------- grouping ----------
+
 export function groupFacts(facts) {
   const groups = Object.fromEntries(GUIDES.map((guide) => [guide.id, []]));
   for (const fact of facts) {
@@ -70,13 +65,8 @@ export function groupFacts(facts) {
   return groups;
 }
 
-// emergency facts are written in plain sentences by the research team, in a few
-// shapes: "Police: 17 or 1548.", "For police, call 101.", "Call 911 for police,
-// ambulance, or fire.", "lists 911 for emergencies, 104 for police", "Embassy
-// Pretoria: +27-12-431-4000". emergencyNumbers() turns those into number rows for
-// the dashboard. if any number in the text can't be matched to a label, it
-// returns { text } instead, so the dashboard shows the sentences as written
-// rather than a list with a number missing or mislabeled.
+// ---------- emergency numbers ----------
+
 const NUM = String.raw`\+?\d[\d-]{0,15}\d`;
 const numbersIn = (text) => text.match(new RegExp(NUM, "g")) || [];
 const BOILERPLATE = /^Local services handle/;
@@ -88,7 +78,6 @@ function tidyLabel(label) {
 }
 
 function parseEmergency(text) {
-  // split into sentences without breaking "U.S."
   const sentences = text
     .split(/(?<=[a-z0-9)])\.\s+(?=[A-Z+])/)
     .map((s) => s.replace(/\.$/, ""))
@@ -96,7 +85,6 @@ function parseEmergency(text) {
   const rows = [];
   const add = (label, numbers) => {
     const last = rows[rows.length - 1];
-    // "Police: 17 or 1548" becomes one row with two numbers
     if (last && last.label === tidyLabel(label)) last.numbers.push(...numbers);
     else rows.push({ label: tidyLabel(label), numbers: [...numbers] });
   };

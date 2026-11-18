@@ -1,11 +1,7 @@
-/* design tokens copied from the Figma hi-fi (RoamReady-Prototype, High-fidelity Layout,
-   "RoamReady hi-fi design system" frame). names match the Figma variables so a value
-   can be traced back: var(--rr-color-text-primary) is color/text/primary in Figma. */
 :root {
-  /* light mode only for now: native controls (date pickers, scrollbars) stay light */
   color-scheme: only light;
 
-  /* palette: the five brand colors plus the helpers the hi-fi uses */
+  /* ---------- palette ---------- */
   --rr-palette-navy: #222e50;
   --rr-palette-teal: #007991;
   --rr-palette-orange: #ffa62b;
@@ -20,10 +16,10 @@
   --rr-palette-line-strong: #d7dfe7;
   --rr-palette-input: #7c869a;
   --rr-palette-teal-deep: #0b4f63;
-  --rr-palette-teal-pale: #7fd3de;     /* "Ready" in the dark wordmark; never text */
-  --rr-palette-orange-light: #ffb547;  /* the primary button's hover */
+  --rr-palette-teal-pale: #7fd3de;
+  --rr-palette-orange-light: #ffb547;
 
-  /* semantic colors */
+  /* ---------- semantic colors ---------- */
   --rr-color-bg-page: var(--rr-palette-snow);
   --rr-color-bg-surface: var(--rr-palette-white);
   --rr-color-bg-subtle: var(--rr-palette-ice);
@@ -32,15 +28,11 @@
   --rr-color-bg-brand: var(--rr-palette-teal);
   --rr-color-bg-brand-deep: var(--rr-palette-teal-deep);
   --rr-color-bg-scrim: rgba(34, 46, 80, 0.6);
-  /* the plain dark shade over band photos, so white text on them stays readable */
   --rr-color-photo-shade-strong: rgba(0, 0, 0, 0.55);
   --rr-color-photo-shade: rgba(0, 0, 0, 0.35);
   --rr-color-photo-shade-soft: rgba(0, 0, 0, 0.2);
-  /* the light snow wash over the Home photo, with navy text on it (David, Nov 16) */
   --rr-color-photo-wash: rgba(255, 251, 254, 0.7);
   --rr-color-photo-wash-strong: rgba(255, 251, 254, 0.8);
-  /* four text colors, nothing else (David, Nov 15): navy, muted, snow on
-     photos / teal / navy, and teal for links in running text */
   --rr-color-text-primary: var(--rr-palette-navy);
   --rr-color-text-secondary: var(--rr-palette-muted);
   --rr-color-text-inverse: var(--rr-palette-snow);
@@ -56,19 +48,16 @@
   --rr-color-action-primary-hover: var(--rr-palette-orange-light);
   --rr-color-action-selected: var(--rr-palette-navy);
 
-  /* the three trip stages that group the guides */
+  /* ---------- trip stages ---------- */
   --rr-color-stage-plan: var(--rr-palette-teal);
   --rr-color-stage-arrive: var(--rr-palette-orange);
-  --rr-color-stage-know: var(--rr-palette-sage);  /* back to sage (David, Nov 11) */
+  --rr-color-stage-know: var(--rr-palette-sage);
 
-  /* the pale tint of each stage (its color laid over white), used behind
-     topic-card icons */
   --rr-color-stage-plan-tint: #c2dfe5;
   --rr-color-stage-arrive-tint: #ffe1b7;
   --rr-color-stage-know-tint: #dfede2;
 
-  /* every guide takes its stage's color, so a stage reads as one group
-     (David, Nov 11). the per-guide names stay so the markup doesn't change */
+  /* ---------- guides ---------- */
   --rr-guide-entry: var(--rr-color-stage-plan);    --rr-guide-tint-entry: var(--rr-color-stage-plan-tint);
   --rr-guide-money: var(--rr-color-stage-plan);    --rr-guide-tint-money: var(--rr-color-stage-plan-tint);
   --rr-guide-phones: var(--rr-color-stage-plan);   --rr-guide-tint-phones: var(--rr-color-stage-plan-tint);
@@ -78,48 +67,38 @@
   --rr-guide-safety: var(--rr-color-stage-know);   --rr-guide-tint-safety: var(--rr-color-stage-know-tint);
   --rr-guide-culture: var(--rr-color-stage-know);  --rr-guide-tint-culture: var(--rr-color-stage-know-tint);
 
-  /* shape and space */
+  /* ---------- shape and space ---------- */
   --rr-radius-sm: 12px;
   --rr-radius-md: 20px;
   --rr-radius-lg: 28px;
   --rr-radius-pill: 999px;
   --rr-content-width: 1184px;
   --rr-gutter: 24px;
-  /* page spacing, taken from the My trip dashboard so every page keeps the
-     same rhythm (David, Nov 11) */
-  --rr-space-top: 32px;      /* top of the band to the page title */
-  --rr-space-gap: 24px;      /* title or band to the content below it, and between cards */
-  --rr-space-card: 28px;     /* inside a card */
-  --rr-space-section: 64px;  /* between sections, and the band's padding below its content */
-  --rr-space-end: 96px;      /* below the last thing on the page */
+  --rr-space-top: 32px;
+  --rr-space-gap: 24px;
+  --rr-space-card: 28px;
+  --rr-space-section: 64px;
+  --rr-space-end: 96px;
 
-  /* elevation styles from Figma ("Hi-fi/Elevation card" and "lifted") */
+  /* ---------- shadows ---------- */
   --rr-shadow-card: 0 1px 2px rgba(34, 46, 80, 0.06), 0 12px 28px -12px rgba(34, 46, 80, 0.22);
   --rr-shadow-lifted: 0 1px 2px rgba(10, 20, 40, 0.08), 0 24px 48px -20px rgba(10, 20, 40, 0.45);
 
-  /* type: Gabarito only, seven sizes for the whole site (David, Nov 15: it had
-     about twenty). every font-size in site.css is one of these */
+  /* ---------- type ---------- */
   --rr-font: "Gabarito", Arial, sans-serif;
-  --rr-text-display: 72px;  /* Home hero, page titles on photos */
-  --rr-text-heading: 44px;  /* section titles, the trip name */
-  --rr-text-subhead: 28px;  /* dialog and topic-section titles, emergency numbers */
-  --rr-text-title: 22px;    /* card titles, login, the Home lead line */
-  --rr-text-body: 17px;     /* body, inputs, buttons, nav, sidebar links */
-  --rr-text-small: 15px;    /* secondary text, footer, chips, Learn more */
-  --rr-text-caption: 13px;  /* sidebar group labels, badges, verified dates */
-  /* three line heights: big type, titles and labels, reading text */
+  --rr-text-display: 72px;
+  --rr-text-heading: 44px;
+  --rr-text-subhead: 28px;
+  --rr-text-title: 22px;
+  --rr-text-body: 17px;
+  --rr-text-small: 15px;
+  --rr-text-caption: 13px;
   --rr-leading-tight: 1.02;
   --rr-leading-snug: 1.2;
   --rr-leading-body: 1.5;
 }
 
-/* motion tokens. the springs are sampled from Apple-style springs (the same
-   "duration + bounce" model as SwiftUI and motion.dev) into CSS linear() curves:
-   bouncy = duration 0.5s, bounce 0.3 (SwiftUI's .bouncy): settles in 820ms, overshoots 4.6%
-   playful = duration 0.45s, bounce 0.45: settles in 905ms, overshoots 12.6%
-   gentle = duration 0.8s, bounce 0.25: settles in 1000ms, overshoots 2.8% (the
-   dashboard's guide cards, slowed down so they float in, David, Nov 11)
-   each curve must run for its settle time, so the duration tokens travel with it */
+/* ---------- motion ---------- */
 :root {
   --rr-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --rr-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -132,7 +111,7 @@
   --rr-stagger: 45ms;
   --rr-stagger-cards: 90ms;
 }
-/* browsers without linear() get the standard ease-out-back curve (easings.net) instead */
+/* ---------- motion fallback ---------- */
 @supports not (transition-timing-function: linear(0, 1)) {
   :root {
     --rr-spring-bouncy: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -144,6 +123,7 @@
   }
 }
 
+/* ---------- phones ---------- */
 @media (max-width: 760px) {
   :root {
     --rr-gutter: 16px;
@@ -151,7 +131,7 @@
     --rr-space-card: 24px;
     --rr-space-section: 48px;
     --rr-space-end: 64px;
-    --rr-text-display: 44px;  /* a three-line topic title still fits the shorter phone photo */
+    --rr-text-display: 44px;
     --rr-text-heading: 32px;
     --rr-text-subhead: 24px;
     --rr-text-title: 20px;

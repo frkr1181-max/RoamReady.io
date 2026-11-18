@@ -1,7 +1,3 @@
-// page shell: a small hash router and its views (home, plan, trip, guide, topic,
-// about, sign up, saved trips). every piece of text from the database goes
-// through esc() before it reaches the page.
-
 import { getDestinations, getFacts, onSourceChange, retryLive } from "./api.js?v=20261110-original24";
 import { GUIDES, STAGES, PURPOSES, guideById, groupFacts, emergencyNumbers, purposeById } from "./guides.js";
 import { tripFromQuery, tripToQuery, rememberDescription, tripDays, formatRange, factQuery, DEMO_TRIP } from "./trip.js";
@@ -12,22 +8,22 @@ import { topicsForGuide } from "./topics.js?v=20261110-original24";
 import { session, signIn, signUp, signOut } from "./auth.js";
 import { listTrips, loadTrip, saveTrip, deleteTrip, fromRow, savedChecks } from "./saved-trips.js";
 
+// ---------- state and helpers ----------
+
 const main = document.querySelector("#main");
 const A = "assets/figma/";
 
-let user = null;               // the signed-in Supabase user, or null
-let loadedTrip = null;         // "<user id>:<trip id>" of the saved trip in memory, so it loads once
-let trip = DEMO_TRIP ? { ...DEMO_TRIP } : null;  // the current guest trip (the test trip when DEMO_TRIP is set), or null
-let destinations = [];         // [{ slug, name, ... }] from the API or the snapshot
-const done = new Set();        // checklist items ticked in this tab
-let renderGeneration = 0;      // bumps on every render, so a slow page can't replace a newer one
-let rendered = false;          // false until the first page is shown
+let user = null;
+let loadedTrip = null;
+let trip = DEMO_TRIP ? { ...DEMO_TRIP } : null;
+let destinations = [];
+const done = new Set();
+let renderGeneration = 0;
+let rendered = false;
 
 const esc = (value) =>
   String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-// only http(s) links from the data become hrefs, so a bad row can't sneak in a
-// javascript: link. returns the normalized URL, or null
 function safeUrl(value) {
   try {
     const url = new URL(value);
@@ -42,21 +38,14 @@ const tripLink = (path) => `#/${path}${trip ? `?${tripToQuery(trip)}` : ""}`;
 
 // ---------- shared pieces ----------
 
-// RoamReady's own 3 photos, for pages that aren't about one country
 const UNIVERSAL = {
-  hero: "assets/photos/universal/hero.webp",     // the beach, beside the sources on Home
-  plan: "assets/photos/universal/plan.webp",     // Plan a trip, No trip yet, About, account pages
-  arrive: "assets/photos/universal/arrive.webp", // the airport, behind the Home hero (David, Nov 16)
+  hero: "assets/photos/universal/hero.webp",
+  plan: "assets/photos/universal/plan.webp",
+  arrive: "assets/photos/universal/arrive.webp",
 };
 
-// a country's photo lives in css/photos.css, not here: the page only says
-// which country and which spot ("dashboard" or "guide"), and the stylesheet
-// has the file for it
 const countryPhoto = (slug, spot) => ({ country: slug, spot });
 
-// fill: the band stretches to cover its wrapper (home hero, trip header) instead
-// of using the page's fixed --band-h height. photo is a file path, or a
-// countryPhoto() for a country's photo
 function band(photo, { arcs = true, fill = false } = {}) {
   const picture = !photo ? ""
     : photo.country !== undefined
@@ -221,7 +210,7 @@ function plan() {
           </div>
           <div class="field">
             <label for="trip-description">Trip description (optional)</label>
-            <textarea class="input-area" id="trip-description" maxlength="500" placeholder="For example: Mostly food, museums and a few day trips.">${esc(t.description)}</textarea><p class="small">This optional description stays in this tab and is not saved to your account.</p>
+            <textarea class="input-area" id="trip-description" maxlength="500" placeholder="For example: Mostly food, museums and a few day trips.">${esc(t.description)}</textarea>
           </div>
           <div><button class="btn btn-primary btn-l" type="submit">Create my plan <img src="${A}icon-arrow-right.svg" alt="" /></button></div>
         </form>
@@ -233,8 +222,6 @@ function plan() {
     </div></div>`;
 }
 
-// the country box: type to filter, or click it (or the arrow) to see every
-// country. Arrow keys move through the list, Enter picks, Escape closes.
 function wireCountryPicker(input) {
   const list = document.querySelector("#country-list");
   const toggle = input.parentElement.querySelector(".combo-toggle");
@@ -262,7 +249,6 @@ function wireCountryPicker(input) {
       : '<li class="combo-empty">No matching countries</li>';
     list.hidden = false;
     input.setAttribute("aria-expanded", "true");
-    // start on the country already in the box, if there is one
     highlight(shown.findIndex((d) => d.name.toLowerCase() === typed));
   };
   const pick = (i) => { input.value = shown[i].name; close(); };
@@ -279,13 +265,13 @@ function wireCountryPicker(input) {
       const step = event.key === "ArrowDown" ? 1 : -1;
       highlight((active + step + shown.length) % shown.length);
     } else if (event.key === "Enter" && isOpen() && active >= 0) {
-      event.preventDefault(); // pick the country instead of sending the form
+      event.preventDefault();
       pick(active);
     } else if (event.key === "Escape" && isOpen()) {
       event.preventDefault(); close();
     }
   });
-  toggle.addEventListener("mousedown", (event) => event.preventDefault()); // keep focus in the box
+  toggle.addEventListener("mousedown", (event) => event.preventDefault());
   toggle.addEventListener("click", () => { input.focus(); isOpen() ? close() : open(true); });
   list.addEventListener("mousedown", (event) => event.preventDefault());
   list.addEventListener("click", (event) => {
@@ -297,7 +283,6 @@ function wireCountryPicker(input) {
 function wirePlan() {
   const form = document.querySelector("#plan-form");
   wireCountryPicker(form.country);
-  // clicking anywhere in a date box opens the calendar, not just the small icon
   form.querySelectorAll('input[type="date"]').forEach((input) =>
     input.addEventListener("click", () => { try { input.showPicker(); } catch {} }));
   form.addEventListener("submit", (event) => {
@@ -309,7 +294,6 @@ function wirePlan() {
     const to = form.to.value;
     const datesBad = Boolean(to && (!from || to < from)) || (from && to && tripDays({from,to}) > 36500);
 
-    // show each error and tie it to its field only while it applies
     const flag = (fieldId, input, errorId, bad) => {
       document.querySelector(fieldId).classList.toggle("invalid", bad);
       input.setAttribute("aria-invalid", String(bad));
@@ -323,7 +307,6 @@ function wirePlan() {
     if (!match) return form.country.focus();
     if (datesBad) return form.to.focus();
 
-    // a new country starts a fresh checklist
     if (trip?.country !== match.slug) done.clear();
     rememberDescription(form["trip-description"].value.trim());
     trip = {
@@ -341,8 +324,6 @@ function wirePlan() {
 
 // ---------- trip dashboard ----------
 
-// the same 8 tasks for every country (Aahana's comment #16). saved trips store
-// them by index (task-0 … task-7, see saved-trips.js), so only add to the end
 const CHECKLIST = [
   "Check your passport is valid for your whole stay",
   "Check that your medicines are allowed where you’re going",
@@ -363,8 +344,6 @@ async function tripView() {
   const purpose = purposeById(trip.purpose);
   const facts = await getFacts(trip.country, factQuery(trip));
   const emergency = emergencyNumbers(facts);
-  // the emergency fact's source is the State Department country page, which
-  // lists the embassy's contacts; label the row by what the page is
   const consular = facts.find((f) => f.category === "emergency")?.sources?.find((s) => safeUrl(s.url));
 
   const chips = [
@@ -373,10 +352,6 @@ async function tripView() {
     [`${A}chip-passport.svg`, "U.S. passport rules"],
   ].filter(Boolean);
 
-  // each tile is a band in its stage color with the guide's icon on the rings
-  // (back to the old icons, David, Nov 11; colors set by tile--<id> in
-  // site.css) over one row: the title and the arrow.
-  // a guide with no reviewed facts for this country says so under its title
   const groups = groupFacts(facts);
   const tiles = GUIDES.map((g) => `<li><a class="tile tile--${g.id}" href="${tripLink(`guide/${g.id}`)}">
       <span class="tile-band"><img class="whisk" src="${A}decor-whisk-rings.svg" alt="" /><span class="glyph tile-icon" style="-webkit-mask-image:url(${g.icon});mask-image:url(${g.icon})"></span></span>
@@ -390,7 +365,6 @@ async function tripView() {
         <span class="box">${CHECK}</span><span class="label">${esc(label)}</span>
       </button></li>`).join("");
 
-  // each number is its own tel: link, so "17 or 1548" can be tapped either way
   const contactRows = (emergency?.rows ?? []).map((row) => `<li class="contact">
       <span class="icon-circle"><img src="${A}${row.label.includes("Embassy") ? "icon-landmark" : "icon-phone"}.svg" alt="" /></span>
       <span><span class="what">${esc(row.label)}</span><span class="number">${row.numbers.map((n) =>
@@ -436,8 +410,6 @@ async function tripView() {
   </div>`;
 }
 
-// the pencil turns the title into a text box: Enter or leaving the box keeps
-// the new name, Escape puts the old one back. Edit trip is for the details.
 function wireRename() {
   const button = document.querySelector("#rename-trip");
   button?.addEventListener("click", () => {
@@ -462,7 +434,6 @@ function wireRename() {
         const oldQuery = `?${tripToQuery(trip)}`;
         trip.name = name;
         const newQuery = `?${tripToQuery(trip)}`;
-        // every link on the page carries the trip, so swap in the new name
         document.querySelectorAll('a[href^="#/"]').forEach((a) => {
           const href = a.getAttribute("href");
           if (href.endsWith(oldQuery)) a.setAttribute("href", href.slice(0, -oldQuery.length) + newQuery);
@@ -486,7 +457,7 @@ function wireRename() {
 
 function wireTrip() {
   wireRename();
-  const status = document.querySelector("#save-status");  // only there when signed in
+  const status = document.querySelector("#save-status");
   document.querySelector("#save-trip")?.addEventListener("click", async (event) => {
     const button = event.currentTarget;
     button.disabled = true;
@@ -494,7 +465,7 @@ function wireTrip() {
     const generation = renderGeneration;
     try {
       const row = await saveTrip({ ...trip }, new Set(done));
-      if (generation !== renderGeneration) return;  // the user already left this page
+      if (generation !== renderGeneration) return;
       trip.id = row.id;
       loadedTrip = `${user?.id}:${row.id}`;
       history.replaceState(null, "", tripLink("trip"));
@@ -521,9 +492,6 @@ function wireTrip() {
 
 const loadTopicData = (country) => (country === "japan" ? loadJapanResearch() : loadCountryTopics());
 
-// the two cards beside a guide or topic page (David, Nov 15: two sections, no
-// divider line): the back link, the trip and a button, then the list of links
-// in its own card (hidden on one-column layouts)
 function sidebar({ label, back, backText, button, links }) {
   return `<nav class="sidebar" aria-label="${label}">
     <div class="card side-card">
@@ -543,7 +511,6 @@ const sideLink = (href, color, current, text) =>
   `<li><a class="side-link" href="${href}" style="--dot:${color}" ${current ? 'aria-current="page"' : ""}><span class="dot" aria-hidden="true"></span>${text}</a></li>`;
 
 function matchLabel(fact) {
-  // conditional facts only show because of the trip's details, so say which ones
   if (fact.applicability_status !== "conditional") return "";
   const bits = [];
   if (fact.applies_to_purposes?.length) bits.push(`${purposeById(trip.purpose)?.label ?? "your"} trip`);
@@ -570,8 +537,6 @@ async function guideView(id) {
     links,
   });
 
-  // no Sources list here: each topic page shows its own sources next to the
-  // facts they back (David, Nov 11)
   return `<div class="page guide">${band(countryPhoto(trip.country, "guide"))}
     <div class="container">
       <div class="guide-columns">
@@ -585,11 +550,7 @@ async function guideView(id) {
     </div></div>`;
 }
 
-// the whole card is clickable, but the real control is the Learn more link
-// (its ::after stretches over the card), so headings stay out of the link.
-// topicsForGuide() never returns an empty topic, so every card has a fact
 function topicCard(guide, topic) {
-  // lead with the fact the card is really about, where the first one isn't
   const lead = topic.id === "visas" ? topic.facts.find((f) => f.applicability_status === "conditional")
     : ["medicine", "medicines"].includes(topic.id) ? topic.facts.find((f) => /medicine/i.test(f.title))
     : null;
@@ -600,7 +561,6 @@ function topicCard(guide, topic) {
   </div></article></li>`;
 }
 
-// source rows: landmark, the page's name, and the open-in-new-tab icon
 function sourceList(sources = []) {
   return `<ul class="source-list">${sources.map((source) => {
     const url = safeUrl(source.url);
@@ -612,7 +572,6 @@ function sourceList(sources = []) {
   }).join("")}</ul>`;
 }
 
-// a draft research note that hasn't been published as a fact yet
 function researchNote(note) {
   return `<section class="research-note">
     <h3>Research draft — awaiting publication review</h3>
@@ -631,7 +590,6 @@ async function topicPage(guideId, topicId) {
   const facts = await getFacts(trip.country, factQuery(trip));
   const topics = topicsForGuide(trip.country, guideId, facts, await loadTopicData(trip.country));
   let topic = topics.find((t) => t.id === topicId);
-  // links from before focused topics used a fact's id as the topic id; keep them working
   if (!topic) {
     const fact = facts.find((f) => f.id === topicId && guide.categories.includes(f.category));
     if (fact) topic = { id: fact.id, title: fact.title, facts: [fact], research: [] };
@@ -674,8 +632,6 @@ async function topicPage(guideId, topicId) {
 // ---------- about ----------
 
 function about() {
-  // the band grows with the title + card (fill), so the sections below never
-  // start on top of the photo, whatever the card's height at this width
   return `<div class="page plan about"><div class="band-wrap">${band(UNIVERSAL.plan, { fill: true })}
     <div class="container">
       <h1 class="page-title" tabindex="-1">About RoamReady</h1>
@@ -757,7 +713,6 @@ async function accountView() {
     <a class="btn btn-secondary" id="new-trip" href="#/plan">Plan a new trip</a></div></div>`;
 }
 
-// forget the trip in this tab (logging out, or starting a new plan)
 function clearTrip() {
   trip = null;
   loadedTrip = null;
@@ -780,8 +735,6 @@ function wireAccount() {
     }
   });
   document.querySelector("#new-trip")?.addEventListener("click", clearTrip);
-  // the confirm dialog's content is in index.html; each Delete trip button
-  // points its confirm button at that trip
   const dialog = document.querySelector("#confirm");
   const confirm = dialog.querySelector("#confirm-delete");
   const status = dialog.querySelector("#delete-status");
@@ -813,7 +766,6 @@ function wireAccount() {
 
 // ---------- router ----------
 
-// wire runs once the page is on screen, for views that have controls
 const ROUTES = {
   "": { nav: "home", title: "RoamReady", view: home, wire: wireHome },
   plan: { nav: "plan", title: "Plan a trip", view: plan, wire: wirePlan },
@@ -826,7 +778,7 @@ const ROUTES = {
 };
 const NOT_FOUND = { nav: null, title: "Page not found", view: notFound };
 
-let pageTitle = null;  // a view can set a more specific title (a guide's or topic's name)
+let pageTitle = null;
 
 async function render() {
   const generation = ++renderGeneration;
@@ -839,11 +791,8 @@ async function render() {
   try { if (rawTopic) topic = decodeURIComponent(rawTopic); } catch {}
   const route = ROUTES[name] ?? NOT_FOUND;
 
-  // the address bar holds the trip, so links and refreshes keep it
   const fromUrl = tripFromQuery(query);
   if (fromUrl) trip = fromUrl;
-  // a saved trip's id in the URL grants nothing: it always loads through the
-  // signed-in user's account
   if (fromUrl?.id && ["trip", "guide", "topic"].includes(name)) {
     user = (await session())?.user || null;
     if (!user) {
@@ -876,7 +825,6 @@ async function render() {
   document.querySelectorAll(".nav a").forEach((link) => {
     if (link.dataset.route === route.nav) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
-    // keep the trip in the nav links too
     if (link.dataset.route === "trip" || link.dataset.route === "plan") link.href = tripLink(link.dataset.route);
   });
   const title = pageTitle || route.title;
@@ -884,9 +832,7 @@ async function render() {
 
   closeMenu();
   window.scrollTo(0, 0);
-  // the bouncy entrance for whatever just arrived (js/motion.js)
   enter(main);
-  // move focus to the new page's heading so screen readers announce it
   if (rendered) main.querySelector("h1")?.focus({ preventScroll: true });
   rendered = true;
 }
@@ -926,8 +872,6 @@ onSourceChange(({ mode, newestCheck }) => {
   }
 });
 
-// the skip link points at #main, which isn't a route: move focus there instead
-// of letting the router treat it as an unknown page
 document.querySelector(".skip-link").addEventListener("click", (event) => {
   event.preventDefault();
   main.focus();
@@ -940,11 +884,9 @@ function showLoadError(error) {
   document.querySelector("#retry-page").onclick = () => render().catch(showLoadError);
 }
 
-// only "#/..." addresses are routes; anything else (an in-page anchor) is left alone
 window.addEventListener("hashchange", () => {
   if (location.hash === "" || location.hash.startsWith("#/")) render().catch(showLoadError);
 });
 
-// signing in is optional: if the auth service can't be reached, the site still works as a guest
 session().then((current) => { user = current?.user || null; }, () => {})
   .then(render).catch(showLoadError);

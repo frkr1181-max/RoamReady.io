@@ -1,25 +1,16 @@
-// the site's only data layer. it reads the two public FastAPI routes and,
-// when the API can't be reached, falls back to data/guide-snapshot.json so a
-// demo never shows an empty guide.
-//
-//   GET /api/destinations                      -> [{ slug, name, iso_alpha2, region, research_owner }]
-//   GET /api/destinations/{slug}/facts?...     -> [TravelFact]  (app/schemas/facts.py)
-//
-// add ?api=http://localhost:8000 (any local port) to the page URL to point at
-// another backend while developing. config.js ignores any other host, so a
-// shared link can't make the site show some other server's "facts".
-
 import { API_BASE, SAVED_GUIDES_ONLY } from "./config.js?v=20261110-original24";
+
+// ---------- settings and state ----------
 
 const TIMEOUT_MS = 4000;
 const SNAPSHOT_URL = "data/guide-snapshot.json?v=20261110-original24";
 
-// "live" or "snapshot". decided on the first request so a missing backend
-// costs one timeout, not one per page
 let mode = null;
 let snapshot = null;
 const factCache = new Map();
 const listeners = new Set();
+
+// ---------- data source ----------
 
 export function onSourceChange(listener) {
   listeners.add(listener);
@@ -34,6 +25,8 @@ function setMode(next) {
   mode = next;
   listeners.forEach((listener) => listener(sourceInfo()));
 }
+
+// ---------- requests ----------
 
 async function getJson(path) {
   const controller = new AbortController();
@@ -52,9 +45,6 @@ async function getJson(path) {
   }
 }
 
-// switch to the saved copy only when the backend is unreachable or broken
-// (no answer, timeout, 5xx). a 4xx means our request was wrong, and the saved
-// copy would hide that by showing facts the API refused
 const backendDown = (error) => !error.status || error.status >= 500;
 
 async function loadSnapshot() {
@@ -66,10 +56,8 @@ async function loadSnapshot() {
   return snapshot;
 }
 
-// the same rule as list_published_facts in app/repositories/destinations.py:
-// with no trip details, hide conditional facts instead of guessing; with a stay
-// range, keep facts whose limits overlap it; with a purpose, keep facts that
-// name it or name none.
+// ---------- filtering ----------
+
 export function filterFacts(facts, { stayMin = null, stayMax = null, purpose = null } = {}) {
   const hasRange = stayMin !== null || stayMax !== null;
   const lo = hasRange ? stayMin ?? 1 : null;
@@ -89,6 +77,8 @@ export function filterFacts(facts, { stayMin = null, stayMax = null, purpose = n
     return purposes == null || purposes.includes(purpose);
   });
 }
+
+// ---------- countries and facts ----------
 
 export async function getDestinations() {
   if (SAVED_GUIDES_ONLY) {
@@ -111,8 +101,6 @@ export async function getDestinations() {
   return (await loadSnapshot()).destinations;
 }
 
-// facts for one country, filtered for this trip. purpose is the API's value
-// (for example "tourism"), already mapped by guides.js
 export async function getFacts(slug, { stayMin = null, stayMax = null, purpose = null } = {}) {
   const key = JSON.stringify([slug, stayMin, stayMax, purpose]);
   if (factCache.has(key)) return factCache.get(key);
@@ -130,7 +118,7 @@ export async function getFacts(slug, { stayMin = null, stayMax = null, purpose =
     } catch (error) {
       if (!backendDown(error)) throw error;
       console.info("[RoamReady] facts request failed, using the saved guide data:", error.message);
-      await loadSnapshot(); // load first, so the footer note can show the copy's date
+      await loadSnapshot();
       setMode("snapshot");
     }
   }

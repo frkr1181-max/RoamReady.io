@@ -1,19 +1,9 @@
-// the bouncy layer. main.js calls enter() after every page change; the actual
-// curves and keyframes live in css/motion.css. nothing here is needed for the
-// site to work: if this file fails, pages simply appear without motion.
-
 import { playLogoBuild } from "./logo-build.js";
 
 const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// entrances happen on two screens only. the trip dashboard (David, Nov 10):
-// its title, chips and guide tiles arrive in that order. and Home, where the
-// logo builds itself in the hero (David, Nov 11: it replaced the slowly
-// spinning rings). everything else is simply there when the page opens, with
-// no entrance and nothing that waits for a scroll.
-// "rise" is for big blocks, "pop" for small repeated pieces, "card" is the
-// slower pop the guide tiles use.
-// base is when the group starts, in ms after the page appears
+// ---------- entrances ----------
+
 const GROUPS = [
   { kind: "rr-rise", base: 0, selector: ".trip .trip-head" },
   { kind: "rr-pop", base: 60, selector: ".trip .chips > li" },
@@ -31,8 +21,8 @@ export function enter(root) {
   playLogoBuild(root.querySelector("[data-logo-build]"));
 }
 
-// dialogs leave with a quick fade instead of vanishing. covers the close
-// button (form method="dialog"), Escape, and clicks on the dimmed backdrop
+// ---------- dialogs ----------
+
 export function closeDialog(dialog, value) {
   if (!dialog.open || dialog.classList.contains("closing")) return;
   if (reduceMotion()) return dialog.close(value);
@@ -41,7 +31,6 @@ export function closeDialog(dialog, value) {
     dialog.classList.remove("closing");
     dialog.close(value);
   };
-  // wait for the dialog's own exit animation (the backdrop's fade fires animationend too)
   const onEnd = (event) => {
     if (event.animationName !== "rr-dialog-out" || event.pseudoElement) return;
     dialog.removeEventListener("animationend", onEnd);
@@ -53,8 +42,6 @@ export function closeDialog(dialog, value) {
 
 export function wireDialogs(dialogs) {
   for (const dialog of dialogs) {
-    // Escape: handled on keydown, because browsers may ignore preventDefault()
-    // on the dialog's own cancel event; cancel stays as a fallback
     dialog.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
       event.preventDefault();
@@ -69,7 +56,6 @@ export function wireDialogs(dialogs) {
       event.preventDefault();
       closeDialog(dialog, event.submitter?.value);
     });
-    // only clicks outside the dialog's box (on the dimmed backdrop) close it
     dialog.addEventListener("click", (event) => {
       if (event.target !== dialog) return;
       const r = dialog.getBoundingClientRect();
@@ -79,7 +65,8 @@ export function wireDialogs(dialogs) {
   }
 }
 
-// a small "no" shake on a field that needs fixing
+// ---------- small touches ----------
+
 export function shake(el) {
   if (!el || reduceMotion() || !el.animate) return;
   el.animate(
@@ -89,7 +76,6 @@ export function shake(el) {
   );
 }
 
-// the phone menu's links drop in one after another
 export function staggerMenu(nav) {
   [...nav.children].forEach((el, i) => el.style.setProperty("--i", i));
 }
